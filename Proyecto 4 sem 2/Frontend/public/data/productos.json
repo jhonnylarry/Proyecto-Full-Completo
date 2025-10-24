@@ -1,0 +1,34 @@
+{
+    "productos": [
+        {
+            "id": 1,
+            "nombre": "Producto A",
+            "descripcion": "Descripción del Producto A",
+            "precio": 100
+        },
+        {
+            "id": 2,
+            "nombre": "Producto B",
+            "descripcion": "Descripción del Producto B",
+            "precio": 200
+        },
+        {
+            "id": 3,
+            "nombre": "Producto C",
+            "descripcion": "Descripción del Producto C",
+            "precio": 300
+        },
+        {
+            "id": 4,
+            "nombre": "Producto D",
+            "descripcion": "Descripción del Producto D",
+            "precio": 400
+        },
+        {
+            "id": 5,
+            "nombre": "Producto E",
+            "descripcion": "Descripción del Producto E",
+            "precio": 500
+        }
+    ]
+}

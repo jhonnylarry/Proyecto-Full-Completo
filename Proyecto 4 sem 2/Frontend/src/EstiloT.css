@@ -1,0 +1,394 @@
+
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
+  color: #333;
+}
+/* estilo principal */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+/* Hacemos al root un contenedor flex en columna para empujar el footer al final */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* El main debe crecer para ocupar el espacio disponible */
+main {
+  flex: 1 0 auto;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
+  color: #333;
+}
+
+header {
+  background: #222;
+  color: white;
+  padding: 15px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: none;
+  background: #0077cc;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+footer {
+  background: #222;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  /* Asegura que el footer no se superponga al contenido y esté pegado al fondo */
+  flex-shrink: 0;
+}
+
+table {
+    margin: 30px auto;
+    width: 90%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+}
+
+table th, table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd; /* separador suave entre filas */
+}
+
+.tabla-bienvenida {
+    margin: 30px auto;
+    width: 90%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background-color: #fff; /* color de fondo suave */
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+}
+
+.tabla-contacto {
+  margin: 30px auto;   /* centra la tabla en la pantalla */
+  width: 50%;          /* ajusta el ancho (puedes poner 40% o 60%) */
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+}
+
+.tabla-contacto td {
+  padding: 10px;
+}
+
+.tabla-contacto input,
+.tabla-contacto textarea {
+  width: 98%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.tabla-contacto button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #0077cc;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.tabla-contacto button:hover {
+  background-color: #005fa3;
+}
+
+
+.tabla-contacto,
+.tabla-contacto td {
+  border: none;   /* saca cualquier borde */
+}
+
+.tabla-nosotros {
+  margin: 30px auto;
+  width: 70%;
+  border-collapse: separate;
+  border-spacing: 20px; /* espacio entre filas */
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+}
+
+.tabla-nosotros td {
+  vertical-align: middle;
+  padding: 15px;
+}
+
+.tabla-nosotros img {
+  width: 120px;
+  height: auto;
+  border-radius: 10px;
+  display: block;
+  margin: 0 auto;
+}
+
+
+img {
+  max-width: 50%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.logo {
+  max-width: 70px;
+  height: auto;
+}
+
+.imagen-tabla {
+  width: 300px;   /* ajusta a tu gusto */
+  height: auto;
+  display: block;
+  margin: 0 auto; /* centra dentro de la celda */
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.menu {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.menu a {
+  color: white;
+  text-decoration: none;
+}
+
+.menu a:hover {
+  text-decoration: underline;
+}
+
+.productos-destacados {
+  padding: 20px;
+}
+
+.lista-productos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  justify-items: center;
+  align-items: stretch;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.producto {
+  background: #fff;
+  padding: 24px 18px 18px 18px;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.18s, box-shadow 0.18s;
+  width: 100%;
+  max-width: 320px;
+  min-width: 220px;
+  min-height: 340px;
+  max-height: 380px;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.producto:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.13);
+}
+
+.producto img {
+  max-width: 160px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.producto h2 {
+  font-size: 1.15rem;
+  margin: 0 0 8px 0;
+  color: #222;
+}
+
+.producto p {
+  font-size: 1.1rem;
+  color: #0077cc;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* barra lateral de administración */
+.sidebar {
+  width: 160px;              /* más delgada (puedes probar 160px también) */
+  background: #222;
+  color: #fff;
+  height: 100vh;
+  padding: 20px 15px;        /* menos padding lateral */
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar h2 {
+  margin-bottom: 0px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  margin: 30px 0;
+}
+
+.sidebar ul li a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.contenido {
+  margin-left: 200px;
+  padding: 20px;
+  width: calc(100% - 180px);
+  box-sizing: border-box;
+}
+
+.contenido table {
+  width: 90%;
+  border-collapse: collapse;
+}
+
+/* Tabla de mensajes */
+#tabla-mensajes {
+  width: 90%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+#tabla-mensajes th,
+#tabla-mensajes td {
+  border: 1px solid #ddd;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+#tabla-mensajes th {
+  background: #fff;
+  color: black;
+  font-weight: bold;
+}
+
+#tabla-mensajes tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+#tabla-mensajes tr:hover {
+  background: #f1f1f1;
+}
+
+/* Evitar que el header solape contenido y dar espacio en páginas como Contacto */
+header {
+  position: relative; /* asegura que no esté en overlay por defecto */
+  z-index: 1000;
+}
+
+main {
+  /* pequeño espacio superior para asegurar separación del header */
+  padding-top: 20px;
+}
+
+.contact-header {
+  margin-top: 6px;
+}
+
+/* Overrides para asegurar header consistente aunque haya CSS global de admin */
+header {
+  width: 100% !important;
+  display: block !important;
+  box-sizing: border-box !important;
+}
+
+header .navbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* logo en el header */
+header img.logo {
+  max-width: 70px !important;
+  height: auto !important;
+}
+
+/* Menú horizontal estable */
+.menu {
+  display: flex !important;
+  gap: 20px !important;
+  align-items: center !important;
+}
+
+/* Forzar que el main comience después del header */
+main {
+  margin-top: 8px; /* pequeño ajuste para evitar solapamiento */
+}
+
+/* Botones en la tabla */
+#tabla-mensajes button {
+  background: #0077cc;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#tabla-mensajes button:hover {
+  background: #0077cc;
+}
