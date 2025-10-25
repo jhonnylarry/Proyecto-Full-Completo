@@ -17,12 +17,12 @@ import lombok.Data;
 @Table(name = "usuarios")
 public class Usuario {
     
-    @Id
+  @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @Column(unique = true, nullable = false)
-    private String rut; // "12345678-K"
+    private String rut; 
     
     @Column(nullable = false)
     private String nombre;
@@ -34,17 +34,17 @@ public class Usuario {
     private String email;
     
     @Column(nullable = false)
-    private String contrasena; // Hasheada!
+    private String contrasena; 
     
     @Column(nullable = false)
-    private LocalDate fechaNacimiento; // Ej: 1990-10-25
+    private LocalDate fechaNacimiento; 
     
-    @ManyToOne
-    @JoinColumn(name = "region_id", nullable = false)
-    private Region region;
-
     @Column(nullable = false)
     private String direccion;
+
+    @ManyToOne
+    @JoinColumn(name = "comuna_id", nullable = false)
+    private Comuna comuna;
     
     @ManyToOne
     @JoinColumn(name = "tipo_usuario_id", nullable = false)

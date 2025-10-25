@@ -2,9 +2,12 @@ package com.backend_prueba.testing.services;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.backend_prueba.testing.entities.Usuario;
 import com.backend_prueba.testing.repositories.UsuarioRepositorio;
 
+@Service
 public class UsuarioServiceImpl implements UsuarioService {
 
     @Autowired

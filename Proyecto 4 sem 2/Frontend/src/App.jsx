@@ -1,4 +1,4 @@
-import Tienda from './tienda.jsx'
+import Tienda from './Tienda.jsx'
 import Admin from './Admin.jsx'
 import { Routes, Route } from 'react-router-dom'
 

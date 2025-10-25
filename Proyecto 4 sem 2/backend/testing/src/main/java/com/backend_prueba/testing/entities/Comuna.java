@@ -31,7 +31,7 @@ public class Comuna {
     @JoinColumn(name = "region_id")
     private Region region;
 
-    @OneToMany(mappedBy = "comuna")
+    @OneToMany(mappedBy = "comuna") 
     @JsonIgnore
     private List<Usuario> usuarios;
 }
