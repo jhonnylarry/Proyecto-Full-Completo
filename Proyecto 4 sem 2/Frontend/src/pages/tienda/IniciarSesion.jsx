@@ -22,41 +22,38 @@ export default function IniciarSesion() {
 
   // --- 3. MODIFICAR EL HANDLESUBMIT ---
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Esto frena la recarga de la página
     setRespuesta(null);
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+    // --- ¡¡AQUÍ ESTÁ EL TRUCO!! ---
+    // En vez de un 'try/catch' con 'fetch', hacemos una lógica falsa
 
-      if (response.ok) {
-        // Si el login es 200 OK, leemos el JSON que mandó el backend
-        const data = await response.json(); // data = { "role": "ADMIN", "token": "..." }
-        
-        // (Opcional pero recomendado) Guardar el token en el navegador
-        // localStorage.setItem('token', data.token); 
-        
-        // --- 4. ¡AQUÍ ESTÁ LA LÓGICA DE REDIRECCIÓN! ---
-        if (data.role === 'ADMIN') {
-          // Si el rol es ADMIN, lo mandamos al dashboard
-          navigate('/admin'); // <-- ¡Usa la ruta de admin de tu App.jsx!
-        } else {
-          // Si es CLIENTE o cualquier otra cosa, lo mandamos al home
-          navigate('/'); // <-- Esta es la ruta de la tienda
-        }
+    const { email, contrasena } = formData;
 
-      } else {
-        // Si es 401 (no autorizado) o 404 (no encontrado)
-        setRespuesta('Error: Correo o contraseña incorrectos.');
-      }
-    } catch (error) {
-      console.error('Error de red:', error);
-      setRespuesta('Error de conexión. Intenta más tarde.');
+    // 1. Simulación de un ADMIN
+    if (email === 'admin@correo.com' && contrasena === 'admin123') {
+      
+      setRespuesta('Inicio de sesión (ADMIN) exitoso');
+      
+      // (Opcional) Podemos guardar un "rol falso" para que el resto de la app sepa
+      localStorage.setItem('userRole', 'ADMIN'); 
+      
+      navigate('/admin'); // ¡Te redirige al Dashboard!
+
+    } 
+    // 2. Simulación de un CLIENTE
+    else if (email === 'cliente@correo.com' && contrasena === 'cliente123') {
+      
+      setRespuesta('Inicio de sesión (CLIENTE) exitoso');
+      
+      localStorage.setItem('userRole', 'CLIENTE');
+
+      navigate('/'); // ¡Te redirige al Home (la tienda)!
+
+    } 
+    // 3. Si no es ninguno de los dos
+    else {
+      setRespuesta('Error: Correo o contraseña incorrectos.');
     }
   };
 

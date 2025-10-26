@@ -40,8 +40,25 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public Usuario actualizar(Long id, Usuario usuarioActualizado) {
         Usuario existente = obtenerId(id);
-        existente.setNombre(usuarioActualizado.getNombre());
-        existente.setEmail(usuarioActualizado.getEmail());
+        if (usuarioActualizado.getRut() != null) existente.setRut(usuarioActualizado.getRut());
+        if (usuarioActualizado.getNombre() != null) existente.setNombre(usuarioActualizado.getNombre());
+        if (usuarioActualizado.getApellido() != null) existente.setApellido(usuarioActualizado.getApellido());
+        if (usuarioActualizado.getEmail() != null) existente.setEmail(usuarioActualizado.getEmail());
+        if (usuarioActualizado.getFechaNacimiento() != null) existente.setFechaNacimiento(usuarioActualizado.getFechaNacimiento());
+        if (usuarioActualizado.getDireccion() != null) existente.setDireccion(usuarioActualizado.getDireccion());
+
+        if (usuarioActualizado.getContrasena() != null && !usuarioActualizado.getContrasena().isEmpty()) {
+            existente.setContrasena(usuarioActualizado.getContrasena()); // (Idealmente hasheada)
+        }
+
+        if (usuarioActualizado.getComuna() != null && usuarioActualizado.getComuna().getId() != null) {
+            existente.setComuna(usuarioActualizado.getComuna());
+        }
+        if (usuarioActualizado.getTipoUsuario() != null && usuarioActualizado.getTipoUsuario().getId() != null) {
+            existente.setTipoUsuario(usuarioActualizado.getTipoUsuario());
+        }
+
+        // ¡Ahora sí, guarda TODOS los cambios!
         return usuarioRepositorio.save(existente);
-    }
+}
 }
