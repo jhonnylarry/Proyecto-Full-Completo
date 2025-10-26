@@ -1,14 +1,15 @@
-import Tienda from './tienda.jsx'
+import Tienda from './Tienda.jsx'
 import Admin from './Admin.jsx'
 import { Routes, Route } from 'react-router-dom'
 
 function App() {
   return (
     <>
-        <Routes>
-          <Route path="/*" element={<Tienda />} />
-          <Route path="/admin" element={<Admin />} />
-        </Routes>
+      <Routes>
+        {/* Esta ruta coincide: */}
+        <Route path="/admin/*" element={<Admin />} /> 
+        <Route path="/*" element={<Tienda />} />
+      </Routes>
     </>
   );
 }

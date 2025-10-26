@@ -15,8 +15,8 @@ export default function Header() {
         </ul>
 
         <div className="menu">
-          <Link to="/inicioSesion" className="inicio-sesion">Iniciar Sesión</Link>
-          <Link to="/registro" className="registro-usuario" style={{ marginLeft: "10px" }}>
+          <Link to="/IniciarSesion" className="inicio-sesion">Iniciar Sesión</Link>
+          <Link to="/registrarse" className="registro-usuario" style={{ marginLeft: "10px" }}>
             Registrarse
           </Link>
           <Link to="/carrito" className="carrito">🛒 Carrito</Link>

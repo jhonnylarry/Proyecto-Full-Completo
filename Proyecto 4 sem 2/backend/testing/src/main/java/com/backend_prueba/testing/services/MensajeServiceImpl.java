@@ -31,7 +31,7 @@ public class MensajeServiceImpl implements MensajeService {
     @Override
     public void eliminar(Long id) {
         if (!mensajeRepositorio.existsById(id)) {
-            throw new RuntimeException("Usuario no encontrado");
+            throw new RuntimeException("Mensaje no encontrado");
         }
         mensajeRepositorio.deleteById(id);
     }
