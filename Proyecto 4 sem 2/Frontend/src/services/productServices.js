@@ -8,7 +8,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
 // Endpoints placeholders (ajusta los paths cuando existan en tu backend)
-const PRODUCTS_ENDPOINT = `${API_BASE_URL}/products`;
+const PRODUCTS_ENDPOINT = `${API_BASE_URL}/productos`;
 
 /**
  * Contrato esperado del backend (sugerido):
@@ -29,11 +29,37 @@ function buildQuery(params = {}) {
 	} = params;
 
 	const qp = new URLSearchParams();
-	if (search) qp.set('search', search);
-	if (category) qp.set('category', category);
+	
+	// Enviar búsqueda como 'nombre' (común en Spring Boot)
+	if (search) qp.set('nombre', search);
+	
+	// Enviar categoría como 'categoriaId' si es numérico, o 'categoria' si es texto
+	if (category) {
+		const catId = parseInt(category, 10);
+		if (!isNaN(catId)) {
+			qp.set('categoriaId', catId);
+		} else {
+			qp.set('categoria', category);
+		}
+	}
+	
+	// Paginación estándar de Spring
 	if (page !== undefined && page !== null) qp.set('page', page);
 	if (size !== undefined && size !== null) qp.set('size', size);
-	if (sort) qp.set('sort', sort);
+	
+	// Ordenamiento: convertir "name,asc" -> "nombre,asc" y "price,asc" -> "precio,asc"
+	if (sort) {
+		const [field, direction] = sort.split(',');
+		const fieldMap = {
+			'name': 'nombre',
+			'price': 'precio',
+			'nombre': 'nombre',
+			'precio': 'precio'
+		};
+		const mappedField = fieldMap[field] || field;
+		qp.set('sort', `${mappedField},${direction || 'asc'}`);
+	}
+	
 	return qp.toString();
 }
 
@@ -48,6 +74,9 @@ export async function getProducts(params = {}, signal) {
 	const qs = buildQuery(params);
 	const url = qs ? `${PRODUCTS_ENDPOINT}?${qs}` : PRODUCTS_ENDPOINT;
 
+	console.log('🔍 Fetching productos con URL:', url);
+	console.log('📦 Parámetros enviados:', params);
+
 	const res = await fetch(url, { signal, headers: { 'Accept': 'application/json' } });
 	if (!res.ok) {
 		const text = await res.text().catch(() => '');
@@ -55,14 +84,17 @@ export async function getProducts(params = {}, signal) {
 	}
 	const data = await res.json();
 
+	console.log('✅ Respuesta del backend:', data);
+
 	// Normaliza respuesta si el backend devuelve otro shape (mínima validación)
 	if (Array.isArray(data)) {
+		// Backend devuelve array directo sin paginación
 		return {
 			content: data,
 			page: params.page ?? 0,
-			size: params.size ?? data.length,
+			size: params.size ?? 12,
 			totalElements: data.length,
-			totalPages: 1,
+			totalPages: Math.ceil(data.length / (params.size ?? 12)),
 		};
 	}
 	if (!data.content) {

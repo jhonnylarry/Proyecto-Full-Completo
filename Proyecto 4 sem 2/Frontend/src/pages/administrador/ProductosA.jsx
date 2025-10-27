@@ -1,5 +1,4 @@
 import '../../EstiloA.css'
-import CrearPro from './CrearPro.jsx'
 import { Link } from 'react-router-dom'
 
 export default function ProductosA() {
@@ -16,7 +15,7 @@ export default function ProductosA() {
 							<p className="admin-card-desc">Ver y gestionar el listado de productos existentes.</p>
 						</div>
 					</Link>
-					<Link to="./CrearPro" className="admin-card">
+					<Link to="nuevo" className="admin-card">
 						<div className="admin-card-inner admin-card-green">
 							<img src="../../img/Productos/Copa vino.png" alt="Nuevo" className="admin-card-img"/>
 							<h2 className="admin-card-title">Nuevo Producto</h2>

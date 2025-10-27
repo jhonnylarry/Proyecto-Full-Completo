@@ -1,92 +1,79 @@
-import { useEffect, useMemo, useState } from 'react';
-import { getProducts } from '../../services/productServices';
+import { useEffect, useState } from 'react';
 import { addItem } from '../../services/cartService';
-
-const PAGE_SIZE = 12;
 
 export default function Productos() {
   const [products, setProducts] = useState([]);
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(PAGE_SIZE);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalElements, setTotalElements] = useState(0);
-  const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('');
-  const [sort, setSort] = useState('name,asc');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [lastAddedId, setLastAddedId] = useState(null);
-
-  // Deriva categorías desde lo cargado (fallback o backend) si no existen endpoints de categorías
-  const categories = useMemo(() => {
-    const set = new Set();
-    products.forEach(p => p.category && set.add(p.category));
-    return [''].concat([...set]);
-  }, [products]);
+  const [quantities, setQuantities] = useState({});
 
   useEffect(() => {
     const ac = new AbortController();
     async function load() {
       setLoading(true);
       setError('');
+      
       try {
-        const data = await getProducts({ search, category, page, size, sort }, ac.signal);
+        const res = await fetch('http://localhost:8080/api/productos', { signal: ac.signal });
+        
+        if (!res.ok) {
+          throw new Error('Error al cargar productos');
+        }
+        
+        const data = await res.json();
+        
         // Normaliza nombres de campos del backend -> frontend
-        const mapped = (data.content || []).map((p) => ({
+        const mapped = (Array.isArray(data) ? data : []).map((p) => ({
           id: p.id,
           name: p.name || p.nombre,
           description: p.description || p.descripcion,
           price: p.price ?? p.precio,
-          imageUrl: p.imageUrl || p.imagenUrl || p.imagen || '',
-          category: p.category || p.categoria || '',
+          imageUrl: p.id ? `http://localhost:8080/api/productos/${p.id}/imagen` : '',
+          category: p.category?.nombre || p.categoria?.nombre || p.category || p.categoria || '',
         }));
 
         setProducts(mapped);
-        setPage(data.page ?? page);
-        setSize(data.size ?? size);
-        setTotalElements(data.totalElements ?? mapped.length);
-        setTotalPages(data.totalPages ?? 1);
       } catch (e) {
-        // Fallback a JSON local para visualización mientras no exista backend
-        try {
-          const res = await fetch('/data/productos.json', { signal: ac.signal });
-          const json = await res.json();
-          const items = (json.productos || []).map((p) => ({
-            id: p.id,
-            name: p.nombre,
-            description: p.descripcion,
-            price: p.precio,
-            imageUrl: '',
-            category: p.categoria || '',
-          }));
-
-          // Paginar en cliente para el fallback
-          const start = page * size;
-          const slice = items.slice(start, start + size);
-          setProducts(slice);
-          setTotalElements(items.length);
-          setTotalPages(Math.max(1, Math.ceil(items.length / size)));
-        } catch (e2) {
-          setError(e?.message || 'No se pudieron cargar los productos.');
+        // Ignorar errores de abort
+        if (e.name === 'AbortError' || ac.signal.aborted) {
+          return;
         }
+        console.error('Error al cargar productos:', e);
+        setError(e?.message || 'No se pudieron cargar los productos.');
       } finally {
-        setLoading(false);
+        if (!ac.signal.aborted) {
+          setLoading(false);
+        }
       }
     }
     load();
     return () => ac.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, category, page, size, sort]);
+  }, []);
 
-  function onSubmit(e) {
-    e.preventDefault();
-    setPage(0);
-    // el efecto se disparará por cambios en search/category/sort
+  function getQuantity(productId) {
+    return quantities[productId] || 1;
+  }
+
+  function setQuantity(productId, value) {
+    const qty = Math.max(1, Math.min(99, parseInt(value) || 1));
+    setQuantities(prev => ({ ...prev, [productId]: qty }));
+  }
+
+  function incrementQuantity(productId) {
+    setQuantity(productId, getQuantity(productId) + 1);
+  }
+
+  function decrementQuantity(productId) {
+    setQuantity(productId, getQuantity(productId) - 1);
   }
 
   function onAddToCart(product) {
-    addItem(product, 1);
+    const quantity = getQuantity(product.id);
+    addItem(product, quantity);
     setLastAddedId(product.id);
+    // Resetear cantidad después de agregar
+    setQuantities(prev => ({ ...prev, [product.id]: 1 }));
     // feedback breve
     setTimeout(() => setLastAddedId(null), 1200);
   }
@@ -95,26 +82,6 @@ export default function Productos() {
     <section className="productos-page container">
       <header className="productos-header">
         <h1>Productos</h1>
-        <form className="productos-filtros" onSubmit={onSubmit}>
-          <input
-            type="search"
-            placeholder="Buscar..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <select value={category} onChange={(e) => { setCategory(e.target.value); setPage(0); }}>
-            {categories.map((c, i) => (
-              <option value={c} key={i}>{c || 'Todas las categorías'}</option>
-            ))}
-          </select>
-          <select value={sort} onChange={(e) => { setSort(e.target.value); setPage(0); }}>
-            <option value="name,asc">Nombre (A-Z)</option>
-            <option value="name,desc">Nombre (Z-A)</option>
-            <option value="price,asc">Precio (menor a mayor)</option>
-            <option value="price,desc">Precio (mayor a menor)</option>
-          </select>
-          <button type="submit">Aplicar</button>
-        </form>
       </header>
 
       {loading && (
@@ -125,51 +92,55 @@ export default function Productos() {
       )}
 
       {!loading && !error && (
-        <>
-          <div className="grid-productos">
-            {products.map((p) => (
-              <article className="card-producto" key={p.id}>
-                <div className="card-img" aria-hidden>
-                  {/* Usa p.imageUrl si existe cuando el backend lo provea */}
-                  {p.imageUrl ? (
-                    <img src={p.imageUrl} alt={p.name} />
-                  ) : (
-                    <div className="placeholder-img">📦</div>
-                  )}
-                </div>
-                <div className="card-body">
-                  <h3 className="card-title">{p.name}</h3>
-                  {p.category && <span className="badge-categoria">{p.category}</span>}
-                  <p className="card-desc">{p.description}</p>
-                  <div className="card-footer">
-                    <span className="price">${'{'}p.price{'}'}</span>
-                    <button className="btn-primary" onClick={() => onAddToCart(p)}>
-                      {lastAddedId === p.id ? 'Agregado ✔' : 'Agregar al carrito'}
+        <div className="grid-productos">
+          {products.map((p) => (
+            <article className="card-producto" key={p.id}>
+              <div className="card-img" aria-hidden>
+                {/* Usa p.imageUrl si existe cuando el backend lo provea */}
+                {p.imageUrl ? (
+                  <img src={p.imageUrl} alt={p.name} />
+                ) : (
+                  <div className="placeholder-img">📦</div>
+                )}
+              </div>
+              <div className="card-body">
+                <h3 className="card-title">{p.name}</h3>
+                {p.category && <span className="badge-categoria">{p.category}</span>}
+                <p className="card-desc">{p.description}</p>
+                <div className="card-footer">
+                  <span className="price">${p.price}</span>
+                  <div className="quantity-controls">
+                    <button 
+                      className="btn-quantity" 
+                      onClick={() => decrementQuantity(p.id)}
+                      disabled={getQuantity(p.id) <= 1}
+                    >
+                      −
+                    </button>
+                    <input 
+                      type="number" 
+                      className="quantity-input"
+                      value={getQuantity(p.id)}
+                      onChange={(e) => setQuantity(p.id, e.target.value)}
+                      min="1"
+                      max="99"
+                    />
+                    <button 
+                      className="btn-quantity" 
+                      onClick={() => incrementQuantity(p.id)}
+                      disabled={getQuantity(p.id) >= 99}
+                    >
+                      +
                     </button>
                   </div>
+                  <button className="btn-add-cart" onClick={() => onAddToCart(p)}>
+                    {lastAddedId === p.id ? '✔ Agregado' : 'Agregar'}
+                  </button>
                 </div>
-              </article>
-            ))}
-          </div>
-
-          <div className="paginacion">
-            <button onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page <= 0}>
-              Anterior
-            </button>
-            <span>
-              Página {page + 1} de {totalPages}
-            </span>
-            <button onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}>
-              Siguiente
-            </button>
-            <select value={size} onChange={(e) => { setSize(Number(e.target.value)); setPage(0); }}>
-              {[6, 12, 24, 48].map((n) => (
-                <option key={n} value={n}>{n} por página</option>
-              ))}
-            </select>
-            <span className="total">Total: {totalElements}</span>
-          </div>
-        </>
+              </div>
+            </article>
+          ))}
+        </div>
       )}
     </section>
   );
