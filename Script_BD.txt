@@ -1,0 +1,25 @@
+INSERT INTO `bd_proyecto`.`tipo_usuario` (`id`, `nombre`) VALUES ('1', 'Admin');
+INSERT INTO `bd_proyecto`.`tipo_usuario` (`id`, `nombre`) VALUES ('2', 'Usuario');
+
+INSERT INTO `bd_proyecto`.`regiones` (`id`, `nombre`) VALUES ('1', 'Metropolitana de Santiago');
+INSERT INTO `bd_proyecto`.`regiones` (`id`, `nombre`) VALUES ('2', 'Valparaíso');
+INSERT INTO `bd_proyecto`.`regiones` (`id`, `nombre`) VALUES ('3', 'Biobío');
+INSERT INTO `bd_proyecto`.`regiones` (`id`, `nombre`) VALUES ('4', 'Los Lagos');
+
+INSERT INTO `bd_proyecto`.`comunas` (`id`,`nombre`, `region_id`) VALUES ('1','Santiago', '1');
+INSERT INTO `bd_proyecto`.`comunas` (`id`,`nombre`, `region_id`) VALUES ('2','Maipú', '1');
+INSERT INTO `bd_proyecto`.`comunas` (`id`,`nombre`, `region_id`) VALUES ('3','Las Condes', '1');
+INSERT INTO `bd_proyecto`.`comunas` (`id`,`nombre`, `region_id`) VALUES ('4','Valparaíso', '2');
+INSERT INTO `bd_proyecto`.`comunas` (`id`,`nombre`, `region_id`) VALUES ('5','Viña del Mar', '2');
+INSERT INTO `bd_proyecto`.`comunas` (`id`,`nombre`, `region_id`) VALUES ('6','Quilpué', '2');
+INSERT INTO `bd_proyecto`.`comunas` (`id`,`nombre`, `region_id`) VALUES ('7','Concepción', '3');
+INSERT INTO `bd_proyecto`.`comunas` (`id`,`nombre`, `region_id`) VALUES ('8','Talcahuano', '3');
+INSERT INTO `bd_proyecto`.`comunas` (`id`,`nombre`, `region_id`) VALUES ('9','Los Ángeles', '3');
+INSERT INTO `bd_proyecto`.`comunas` (`id`,`nombre`, `region_id`) VALUES ('10','Puerto Montt', '4');
+INSERT INTO `bd_proyecto`.`comunas` (`id`,`nombre`, `region_id`) VALUES ('11','Osorno', '4');
+INSERT INTO `bd_proyecto`.`comunas` (`id`,`nombre`, `region_id`) VALUES ('12','Castro', '4');
+
+INSERT INTO `bd_proyecto`.`categorias` (`id`, `nombre`) VALUES ('1', 'Copas');
+INSERT INTO `bd_proyecto`.`categorias` (`id`, `nombre`) VALUES ('2', 'Vasos');
+INSERT INTO `bd_proyecto`.`categorias` (`id`, `nombre`) VALUES ('3', 'Placas');
+INSERT INTO `bd_proyecto`.`categorias` (`id`, `nombre`) VALUES ('4', 'Otros');

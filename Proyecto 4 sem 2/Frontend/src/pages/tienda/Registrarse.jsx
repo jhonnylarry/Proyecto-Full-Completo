@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-// Asegúrate de tener tu constante de URL
+
 const API_BASE_URL = 'http://localhost:8080/api';
 
 export default function Registrarse() {
@@ -18,8 +18,8 @@ export default function Registrarse() {
 
   // --- 1. ESTADOS MODIFICADOS ---
   const [regiones, setRegiones] = useState([]);
-  const [todasLasComunas, setTodasLasComunas] = useState([]); // <-- NUEVO
-  const [comunasFiltradas, setComunasFiltradas] = useState([]); // <-- NUEVO (las que se muestran)
+  const [todasLasComunas, setTodasLasComunas] = useState([]); 
+  const [comunasFiltradas, setComunasFiltradas] = useState([]); 
   
   const [selectedRegion, setSelectedRegion] = useState('');
   const [respuesta, setRespuesta] = useState(null);
@@ -33,15 +33,13 @@ export default function Registrarse() {
       .catch(err => console.error("Error al cargar regiones:", err));
       
     // Cargar TODAS las Comunas
-    fetch(`${API_BASE_URL}/comunas`) // <-- ¡NUEVO FETCH!
+    fetch(`${API_BASE_URL}/comunas`) 
       .then(res => res.json())
       .then(data => setTodasLasComunas(data))
       .catch(err => console.error("Error al cargar comunas:", err));
       
-  }, []); // El array vacío [] significa que solo se ejecuta 1 vez
+  }, []); 
 
-  // --- 3. useEffect ELIMINADO ---
-  // (Ya no necesitamos el useEffect que escuchaba [selectedRegion])
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;

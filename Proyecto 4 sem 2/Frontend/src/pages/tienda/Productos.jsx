@@ -91,7 +91,15 @@ export default function Productos() {
         <div className="estado error">{error}</div>
       )}
 
-      {!loading && !error && (
+      {!loading && !error && products.length === 0 && (
+        <div className="estado-vacio">
+          <span className="icono-vacio">📦</span>
+          <h3>No hay productos disponibles</h3>
+          <p>Por el momento no hay productos en el catálogo. Vuelve pronto.</p>
+        </div>
+      )}
+
+      {!loading && !error && products.length > 0 && (
         <div className="grid-productos">
           {products.map((p) => (
             <article className="card-producto" key={p.id}>
