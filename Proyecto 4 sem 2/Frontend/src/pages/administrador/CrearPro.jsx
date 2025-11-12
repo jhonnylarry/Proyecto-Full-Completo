@@ -24,22 +24,40 @@ export default function CrearPro() {
   const [imagenPreview, setImagenPreview] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/categorias`)
-      .then(response => {
-        if (!response.ok) {
+    const fetchCategorias = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/catalogo`);
+        if (!res.ok) {
           throw new Error('Error al cargar categorías');
         }
-        return response.json();
-      })
-      .then(data => {
-        setCategorias(data);
+        const data = await res.json();
+
+        // Normaliza posibles estructuras: id, nombre | idCategoria, name | etc.
+        const normalizadas = Array.isArray(data)
+          ? data
+              .map((cat) => {
+                const id = cat?.id ?? cat?.idCategoria ?? cat?.catalogoId ?? cat?.codigo ?? cat?.Id;
+                const nombre =
+                  cat?.nombre ??
+                  cat?.name ??
+                  cat?.titulo ??
+                  cat?.descripcion ??
+                  (id != null ? `Categoría ${id}` : 'Categoría');
+                return id != null ? { id, nombre: String(nombre) } : null;
+              })
+              .filter(Boolean)
+          : [];
+
+        setCategorias(normalizadas);
         setLoadingCategorias(false);
-      })
-      .catch(error => {
-        console.error('Error al obtener las categorías:', error);
+      } catch (err) {
+        console.error('Error al obtener las categorías:', err);
         setError('No se pudieron cargar las categorías');
         setLoadingCategorias(false);
-      });
+      }
+    };
+
+    fetchCategorias();
   }, []);
 
   const handleChange = (e) => {
@@ -158,7 +176,7 @@ export default function CrearPro() {
   const handleCancel = () => {
     const tieneContenido = Object.values(producto).some(val => val !== '');
     if (!tieneContenido || window.confirm('¿Está seguro de cancelar? Se perderán los datos ingresados.')) {
-      navigate('/inventario');
+      navigate('/admin/productos');
     }
   };
 
@@ -169,7 +187,7 @@ export default function CrearPro() {
 
   return (
     <>
-      <main>
+      <div className="admin-main">
       <div className="crear-producto-container">
         <div className="form-card">
           <h2>Crear Producto</h2>
@@ -269,7 +287,7 @@ export default function CrearPro() {
           )}
         </div>
       </div>
-      </main>
+      </div>
     </>
   );
 }

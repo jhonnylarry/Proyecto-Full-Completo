@@ -5,6 +5,8 @@ import Contactanos from './pages/tienda/Contactanos'
 import BlogD1 from './pages/tienda/BlogD1'
 import BlogD2 from './pages/tienda/BlogD2'
 import Registro from './pages/tienda/Registrarse'
+import Productos from './pages/tienda/Productos'
+import Carrito from './pages/tienda/Carrito'
 import IniciarSesion from './pages/tienda/IniciarSesion'
 import Header from './componentes/Header'
 import Footer from './componentes/Footer'
@@ -19,6 +21,8 @@ function Tienda() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/productos" element={<Productos />} />
+          <Route path="/carrito" element={<Carrito />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/contacto" element={<Contactanos />} />
