@@ -60,5 +60,10 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         // ¡Ahora sí, guarda TODOS los cambios!
         return usuarioRepositorio.save(existente);
-}
+    }
+        @Override
+    public Usuario obtenerPorEmail(String email) {
+        return usuarioRepositorio.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + email));
+    }
 }
