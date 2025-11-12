@@ -3,60 +3,71 @@ import { useNavigate } from 'react-router-dom'; // <-- 1. IMPORTAR EL HOOK
 
 const API_BASE_URL = 'http://localhost:8080/api';
 export default function IniciarSesion() {
+ const navigate = useNavigate(); 
 
- const navigate = useNavigate(); // <-- 2. INICIALIZAR EL HOOK
+  const [formData, setFormData] = useState({
+    email: '',
+    contrasena: ''
+  });
+  const [respuesta, setRespuesta] = useState(null);
 
-  const [formData, setFormData] = useState({
-    email: '',
-    contrasena: ''
-  });
-  const [respuesta, setRespuesta] = useState(null);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
-  };
+  // --- ¡Este es el handleSubmit REAL, con fetch! ---
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Evita que la página se recargue
+    setRespuesta(null); // Limpiamos respuesta anterior
 
-  // --- 3. MODIFICAR EL HANDLESUBMIT ---
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Esto frena la recarga de la página
-    setRespuesta(null);
+    try {
+      // ¡Este fetch AHORA SÍ va al backend!
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData), // Manda { email, contrasena }
+      });
 
-    // --- ¡¡AQUÍ ESTÁ EL TRUCO!! ---
-    // En vez de un 'try/catch' con 'fetch', hacemos una lógica falsa
+      if (response.ok) {
+        // 2. Si el backend dice OK, lee el JSON
+        // Espera { "role": "ADMIN", "usuarioId": 1, "nombreUsuario": "Admin" }
+        const data = await response.json(); 
+        
+        // --- ¡AQUÍ ESTÁ EL CAMBIO! ---
+        // 3. Guarda TODO en localStorage como un JSON string
+        const usuarioData = {
+          id: data.usuarioId,
+          nombre: data.nombreUsuario,
+          role: data.role
+        };
+        // Guardamos el objeto 'usuario' como texto
+        localStorage.setItem('usuario', JSON.stringify(usuarioData)); 
+        // --- FIN DEL CAMBIO ---
+        
+        // 4. Redirige según el rol
+        if (data.role === 'ADMIN') {
+          navigate('/admin');
+        } else {
+          // Para 'CLIENTE' o cualquier otro rol
+        navigate('/');
+        }
 
-    const { email, contrasena } = formData;
-
-    // 1. Simulación de un ADMIN
-    if (email === 'admin@correo.com' && contrasena === 'admin123') {
-      
-      setRespuesta('Inicio de sesión (ADMIN) exitoso');
-      
-      // (Opcional) Podemos guardar un "rol falso" para que el resto de la app sepa
-      localStorage.setItem('userRole', 'ADMIN'); 
-      
-      navigate('/admin'); // ¡Te redirige al Dashboard!
-
-    } 
-    // 2. Simulación de un CLIENTE
-    else if (email === 'cliente@correo.com' && contrasena === 'cliente123') {
-      
-      setRespuesta('Inicio de sesión (CLIENTE) exitoso');
-      
-      localStorage.setItem('userRole', 'CLIENTE');
-
-      navigate('/'); // ¡Te redirige al Home (la tienda)!
-
-    } 
-    // 3. Si no es ninguno de los dos
-    else {
-      setRespuesta('Error: Correo o contraseña incorrectos.');
-    }
-  };
-
+      } else {
+        // Si el backend dijo 401 (no autorizado) o 404
+        setRespuesta('Error: Correo o contraseña incorrectos.');
+      }
+    } catch (error) {
+      // Si hay un error de red (backend apagado, CORS, etc.)
+      console.error('Error de red:', error);
+      setRespuesta('Error de conexión. Intenta más tarde.');
+    }
+  };
   // --- 5. El JSX (Tu HTML convertido) ---
   return (
     <>

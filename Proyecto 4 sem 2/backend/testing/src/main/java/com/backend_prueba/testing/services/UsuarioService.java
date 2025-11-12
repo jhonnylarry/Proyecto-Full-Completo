@@ -11,4 +11,5 @@ public interface UsuarioService {
     List<Usuario> listarTodas();
     void eliminar(Long id);
     Usuario actualizar(Long id, Usuario usuarioActualizado);
+    Usuario obtenerPorEmail(String email);
 }
