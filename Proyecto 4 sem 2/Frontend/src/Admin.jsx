@@ -12,9 +12,9 @@ import BarraLat from './componentes/BarraLat.jsx'
 
 function Admin() {
   return (
-    <>
-    <BarraLat />
-      <main>
+    <div className="admin-root-container">
+      <BarraLat />
+      <div className="admin-wrapper">
         <Routes>
           <Route index element={<Dashboard />} />
           <Route path="productos" element={<ProductoasA />} />
@@ -24,8 +24,8 @@ function Admin() {
           <Route path="usuarios/nuevo" element={<CrearUsuario />} />
           <Route path="usuarios/editar/:usuarioId" element={<EditarUsuario />} />
         </Routes>
-      </main>
-    </>
+      </div>
+    </div>
   );
 }
 

@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend_prueba.testing.entities.Producto;
+import com.backend_prueba.testing.entities.Categoria;
 import com.backend_prueba.testing.services.ProductoService;
+import com.backend_prueba.testing.services.CatalogoService;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
@@ -34,10 +36,59 @@ public class ProductoRestControllers {
     @Autowired
     private ProductoService productoServices;
 
+    @Autowired
+    private CatalogoService catalogoService;
+
     @PostMapping
     public ResponseEntity<Producto> crearProducto(@RequestBody Producto producto) {
         Producto nuevoProducto = productoServices.crear(producto);
         return ResponseEntity.ok(nuevoProducto);
+    }
+
+    // Nuevo endpoint para crear producto con imagen en una sola petición
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Producto> crearProductoConImagen(
+            @RequestParam("nombre") String nombre,
+            @RequestParam("descripcion") String descripcion,
+            @RequestParam("precio") Long precio,
+            @RequestParam("stock") Integer stock,
+            @RequestParam("categoriaId") Long categoriaId,
+            @RequestParam(value = "imagen", required = false) MultipartFile imagen) {
+        try {
+            Producto producto = new Producto();
+            producto.setNombre(nombre);
+            producto.setDescripcion(descripcion);
+            producto.setPrecio(precio);
+            producto.setStock(stock);
+            
+            // Obtener la categoría desde el servicio
+            Categoria categoria = catalogoService.obtenerId(categoriaId);
+            producto.setCategoria(categoria);
+            producto.setActivo(true);
+            
+            // Si hay imagen, validar y agregar
+            if (imagen != null && !imagen.isEmpty()) {
+                // Validar tamaño (2MB máximo)
+                if (imagen.getSize() > 2 * 1024 * 1024) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                }
+                // Validar tipo
+                String contentType = imagen.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                }
+                producto.setImagen(imagen.getBytes());
+                producto.setImagenContentType(imagen.getContentType());
+            }
+            
+            Producto nuevoProducto = productoServices.crear(producto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(nuevoProducto);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (RuntimeException e) {
+            // Categoría no encontrada u otro error
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @GetMapping("/{id}")
