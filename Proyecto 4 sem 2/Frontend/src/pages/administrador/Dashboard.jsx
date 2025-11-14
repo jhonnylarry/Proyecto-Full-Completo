@@ -96,7 +96,7 @@ export default function DashboardAdmin() {
   }, [pedidos]);
 
   // Lógica para "Productos más vendidos" (Gráfico de Barras)
-  const productosMasVendidos = useMemo(() => {
+  const productosVendidos = useMemo(() => {
     const productosMap = new Map();
     
     for (const pedido of pedidos) {
@@ -202,10 +202,10 @@ export default function DashboardAdmin() {
       {/* --- GRÁFICO 2: PRODUCTOS MÁS VENDIDOS (BARRAS) --- */}
       <div className="chart-container" style={{marginTop: '50px'}}>
         <h2 className="admin-main-title" style={{fontSize: '1.5rem', borderLeftWidth: '5px'}}>
-          Productos Más Vendidos (Top 5)
+          Productos Vendidos
         </h2>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={productosMasVendidos}>
+          <BarChart data={productosVendidos}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="nombre" />
             <YAxis />
