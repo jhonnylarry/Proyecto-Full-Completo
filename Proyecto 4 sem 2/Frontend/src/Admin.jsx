@@ -2,6 +2,7 @@ import React from 'react';
 import Dashboard from './pages/administrador/Dashboard.jsx'
 import ProductoasA from './pages/administrador/ProductosA.jsx'
 import CrearPro from './pages/administrador/CrearPro.jsx'
+import ModificarPro from './pages/administrador/ModificarPro.jsx'
 import Mensajes from './pages/administrador/Mensajes.jsx'
 import Usuarios from './pages/administrador/Usuarios.jsx'
 import CrearUsuario from './pages/administrador/CrearUsuario.jsx'
@@ -19,6 +20,8 @@ function Admin() {
           <Route index element={<Dashboard />} />
           <Route path="productos" element={<ProductoasA />} />
           <Route path="productos/nuevo" element={<CrearPro />} />
+          <Route path="productos/editar" element={<ModificarPro />} />
+          <Route path="productos/editar/:productoId" element={<ModificarPro />} />
           <Route path="mensajes" element={<Mensajes />} />
           <Route path="usuarios" element={<Usuarios />} />
           <Route path="usuarios/nuevo" element={<CrearUsuario />} />
