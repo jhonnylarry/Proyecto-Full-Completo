@@ -8,9 +8,12 @@ export default function CrearPro() {
   const navigate = useNavigate();
 
   const [producto, setProducto] = useState({
+    codigo_producto: '',
     nombre: '',
     descripcion: '',
     precio: '',
+    stock: '',
+    stock_critico: '',
     categoria: ''
   });
 
@@ -93,20 +96,42 @@ export default function CrearPro() {
     setError(null);
     setLoading(true);
 
-    // Validación simple de precio
-    const precioParsed = producto.precio !== '' ? parseFloat(producto.precio) : NaN;
+    // Validaciones
+    const precioParsed = producto.precio !== '' ? parseInt(producto.precio, 10) : NaN;
     if (isNaN(precioParsed) || precioParsed <= 0) {
       setError('Ingresa un precio válido mayor que 0');
       setLoading(false);
       return;
     }
 
+    const stockParsed = producto.stock !== '' ? parseInt(producto.stock, 10) : 0;
+    if (isNaN(stockParsed) || stockParsed < 0) {
+      setError('El stock debe ser un número válido mayor o igual a 0');
+      setLoading(false);
+      return;
+    }
+
+    const stockCriticoParsed = producto.stock_critico !== '' ? parseInt(producto.stock_critico, 10) : 0;
+    if (isNaN(stockCriticoParsed) || stockCriticoParsed < 0) {
+      setError('El stock crítico debe ser un número válido mayor o igual a 0');
+      setLoading(false);
+      return;
+    }
+
+    if (!producto.codigo_producto.trim()) {
+      setError('El código de producto es obligatorio');
+      setLoading(false);
+      return;
+    }
+
     const productoParaEnviar = {
+      codigo_producto: producto.codigo_producto.trim(),
       nombre: producto.nombre.trim(),
       descripcion: producto.descripcion.trim(),
       precio: precioParsed,
+      stock: stockParsed,
+      stock_critico: stockCriticoParsed,
       categoria: { id: parseInt(producto.categoria, 10) },
-      stock: 0,
       activo: true
     };
 
@@ -204,6 +229,17 @@ export default function CrearPro() {
             <form onSubmit={handleSubmit}>
               <div className="form-row">
                 <div className="form-group">
+                  <label htmlFor="codigo_producto">
+                    Código de Producto <span className="required">*</span>
+                  </label>
+                  <input
+                    type="text" id="codigo_producto" name="codigo_producto" value={producto.codigo_producto}
+                    onChange={handleChange} disabled={loading} maxLength={50}
+                    placeholder="Ej: PROD-001" required
+                  />
+                </div>
+
+                <div className="form-group">
                   <label htmlFor="nombre">
                     Nombre del producto <span className="required">*</span>
                   </label>
@@ -213,7 +249,9 @@ export default function CrearPro() {
                     placeholder="Ej: Sopaipillas con pebre" required
                   />
                 </div>
+              </div>
 
+              <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="precio">
                     Precio <span className="required">*</span>
@@ -226,6 +264,28 @@ export default function CrearPro() {
                       placeholder="1000" required
                     />
                   </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="stock">
+                    Stock <span className="required">*</span>
+                  </label>
+                  <input
+                    type="number" id="stock" name="stock" step="1" min="0"
+                    value={producto.stock} onChange={handleChange} disabled={loading}
+                    placeholder="0" required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="stock_critico">
+                    Stock Crítico <span className="required">*</span>
+                  </label>
+                  <input
+                    type="number" id="stock_critico" name="stock_critico" step="1" min="0"
+                    value={producto.stock_critico} onChange={handleChange} disabled={loading}
+                    placeholder="5" required
+                  />
                 </div>
               </div>
 

@@ -20,12 +20,14 @@ Se agregó un **nuevo endpoint** en `ProductoRestControllers.java` que permite c
 
 | Campo         | Tipo          | Requerido | Descripción                              |
 |---------------|---------------|-----------|------------------------------------------|
-| `nombre`      | String        | ✅ Sí     | Nombre del producto                      |
-| `descripcion` | String        | ✅ Sí     | Descripción del producto                 |
-| `precio`      | Long/Number   | ✅ Sí     | Precio del producto                      |
-| `stock`       | Integer       | ✅ Sí     | Cantidad en stock                        |
-| `categoriaId` | Long/Number   | ✅ Sí     | ID de la categoría (de /api/catalogo)    |
-| `imagen`      | File          | ❌ No     | Archivo de imagen (máx 2MB)              |
+| `codigo_producto` | String        | ✅ Sí     | Código único del producto (SKU)          |
+| `nombre`          | String        | ✅ Sí     | Nombre del producto                      |
+| `descripcion`     | String        | ✅ Sí     | Descripción del producto                 |
+| `precio`          | Long/Number   | ✅ Sí     | Precio del producto                      |
+| `stock`           | Integer       | ✅ Sí     | Cantidad inicial en stock                |
+| `stock_critico`   | Integer       | ✅ Sí     | Nivel mínimo de stock para alertas       |
+| `categoriaId`     | Long/Number   | ✅ Sí     | ID de la categoría (de /api/catalogo)    |
+| `imagen`          | File          | ❌ No     | Archivo de imagen (máx 2MB)              |
 
 ### **Validaciones Backend:**
 
@@ -40,10 +42,12 @@ Se agregó un **nuevo endpoint** en `ProductoRestControllers.java` que permite c
 ```json
 {
   "id": 1,
+  "codigo_producto": "PROD-001",
   "nombre": "Producto ejemplo",
   "descripcion": "Descripción del producto",
   "precio": 15000,
-  "stock": 10,
+  "stock": 100,
+  "stock_critico": 10,
   "activo": true,
   "categoria": {
     "id": 1,

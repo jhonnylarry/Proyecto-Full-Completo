@@ -1,8 +1,9 @@
 import React from 'react';
 import Dashboard from './pages/administrador/Dashboard.jsx'
-import ProductoasA from './pages/administrador/ProductosA.jsx'
+import ProductosA from './pages/administrador/ProductosA.jsx'
 import CrearPro from './pages/administrador/CrearPro.jsx'
 import ModificarPro from './pages/administrador/ModificarPro.jsx'
+import MostrarPro from './pages/administrador/MostrarPro.jsx';
 import Mensajes from './pages/administrador/Mensajes.jsx'
 import Usuarios from './pages/administrador/Usuarios.jsx'
 import CrearUsuario from './pages/administrador/CrearUsuario.jsx'
@@ -18,7 +19,8 @@ function Admin() {
       <div className="admin-wrapper">
         <Routes>
           <Route index element={<Dashboard />} />
-          <Route path="productos" element={<ProductoasA />} />
+          <Route path="productos" element={<ProductosA />} />
+          <Route path="productos/stock" element={<MostrarPro />} />
           <Route path="productos/nuevo" element={<CrearPro />} />
           <Route path="productos/editar" element={<ModificarPro />} />
           <Route path="productos/editar/:productoId" element={<ModificarPro />} />

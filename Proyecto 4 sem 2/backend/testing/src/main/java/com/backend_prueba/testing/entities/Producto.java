@@ -26,6 +26,9 @@ public class Producto {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
+    private String codigo_producto;
+
     @Column(nullable = false)
     private String nombre;
     private String descripcion;
@@ -33,6 +36,7 @@ public class Producto {
     @Column(nullable = false)
     private Long precio;
     private Integer stock;
+    private Integer stock_critico;
     
     @Lob
     @JsonIgnore

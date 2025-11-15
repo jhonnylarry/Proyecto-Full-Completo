@@ -8,10 +8,10 @@ export default function ProductosA() {
 			<div className="admin-main">
 				<h1 className="admin-main-title">Administración de Productos</h1>
 				<div className="admin-cards">
-					<Link to="/admin/productos" className="admin-card">
+					<Link to="/admin/productos/stock" className="admin-card">
 						<div className="admin-card-inner admin-card-blue">
 							<img src="/img/Productos/Imagen 1.jpg" alt="Mostrar" className="admin-card-img"/>
-							<h2 className="admin-card-title">Mostrar Productos</h2>
+							<h2 className="admin-card-title">Stock Productos</h2>
 							<p className="admin-card-desc">Ver y gestionar el listado de productos existentes.</p>
 						</div>
 					</Link>

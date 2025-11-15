@@ -48,18 +48,22 @@ public class ProductoRestControllers {
     // Nuevo endpoint para crear producto con imagen en una sola petición
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Producto> crearProductoConImagen(
+            @RequestParam("codigo_producto") String codigoProducto,
             @RequestParam("nombre") String nombre,
             @RequestParam("descripcion") String descripcion,
             @RequestParam("precio") Long precio,
             @RequestParam("stock") Integer stock,
+            @RequestParam("stock_critico") Integer stockCritico,
             @RequestParam("categoriaId") Long categoriaId,
             @RequestParam(value = "imagen", required = false) MultipartFile imagen) {
         try {
             Producto producto = new Producto();
+            producto.setCodigo_producto(codigoProducto);
             producto.setNombre(nombre);
             producto.setDescripcion(descripcion);
             producto.setPrecio(precio);
             producto.setStock(stock);
+            producto.setStock_critico(stockCritico);
             
             // Obtener la categoría desde el servicio
             Categoria categoria = catalogoService.obtenerId(categoriaId);
