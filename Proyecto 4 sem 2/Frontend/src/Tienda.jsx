@@ -8,6 +8,7 @@ import Registro from './pages/tienda/Registrarse'
 import Productos from './pages/tienda/Productos'
 import Carrito from './pages/tienda/Carrito'
 import IniciarSesion from './pages/tienda/IniciarSesion'
+import HistorialCompras from './pages/tienda/HistorialCompras'
 import Header from './componentes/Header'
 import Footer from './componentes/Footer'
 import { Routes, Route } from 'react-router-dom'
@@ -30,6 +31,7 @@ function Tienda() {
           <Route path="/blogs/d2" element={<BlogD2 />} />
           <Route path="/registrarse" element={<Registro />} />
           <Route path="/iniciarSesion" element={<IniciarSesion />} />
+          <Route path="/historialCompras" element={<HistorialCompras />} />
         </Routes>
       </main>
 

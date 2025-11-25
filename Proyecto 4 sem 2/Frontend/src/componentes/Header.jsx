@@ -52,6 +52,9 @@ export default function Header() {
                   <Link to="/admin" style={{ color: '#f1c40f', marginLeft: '10px' }}>(Ir al Panel)</Link>
                 )}
               </span>
+              <Link to="/historialCompras" style={{ color: '#ddd', marginLeft: '10px' }}>
+                Mis Compras
+              </Link>
 
               {usuario.role !== 'ADMIN' && (
                 <Link to="/carrito" className="carrito" style={{ marginLeft: "10px" }}>🛒 Carrito</Link>
