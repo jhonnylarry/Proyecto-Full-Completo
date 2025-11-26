@@ -2,6 +2,7 @@ package com.backend_prueba.testing.entities;
 import jakarta.persistence.*; // Asegúrate que sea jakarta
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -26,8 +27,6 @@ public class Pedido {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario; // Aquí vinculamos al usuario que compró
 
-    // Relación: Un pedido tiene MUCHOS detalles
-    // CascadeType.ALL significa: si guardo este Pedido, guarda también todos sus Detalles.
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private List<DetallePedido> detalles;
 }

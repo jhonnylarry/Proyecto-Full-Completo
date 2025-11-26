@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // <-- 1. IMPORTAR useNavigate
-import { getCart, setCart, removeItem, updateQuantity, clearCart } from '../../services/cartService.js'; // <-- CORRECCIÓN: Añadida extensión .js
+import { useNavigate } from 'react-router-dom';
+import { getCart, removeItem, updateQuantity, clearCart } from '../../services/cartService.js';
+import { jsPDF } from 'jspdf'; // <--- IMPORTANTE: Librería para crear el PDF
+import autoTable from "jspdf-autotable"; // <--- IMPORTANTE: Librería para la tabla del PDF
 
-// (Tu constante de API)
 const API_BASE_URL = 'http://localhost:8080/api';
 
-// (Tu función de formato de moneda)
+// Función para formatear dinero (CLP)
 function formatCurrency(n) {
   try {
     return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n || 0);
@@ -16,20 +17,17 @@ function formatCurrency(n) {
 
 export default function Carrito() {
   const [items, setItems] = useState([]);
-  
-  // --- 2. NUEVOS ESTADOS ---
-  const [usuario, setUsuario] = useState(null); // Para guardar al usuario logueado
-  const [respuesta, setRespuesta] = useState(null); // Para mensajes de error/éxito
-  const navigate = useNavigate(); // Para redirigir
+  const [usuario, setUsuario] = useState(null);
+  const [respuesta, setRespuesta] = useState(null);
+  const navigate = useNavigate();
 
-  // --- 3. useEffect ACTUALIZADO ---
+  // --- Cargar carrito y usuario ---
   useEffect(() => {
-    // Carga los items del carrito (esto ya lo tenías)
     setItems(getCart());
+    
     function onUpdate(e) { setItems(e.detail.items); }
     window.addEventListener('cart:update', onUpdate);
     
-    // ¡NUEVO! Carga al usuario desde localStorage
     const usuarioGuardado = localStorage.getItem('usuario');
     if (usuarioGuardado) {
       setUsuario(JSON.parse(usuarioGuardado));
@@ -38,10 +36,12 @@ export default function Carrito() {
     return () => window.removeEventListener('cart:update', onUpdate);
   }, []);
 
+  // --- Calcular total ---
   const subtotal = useMemo(() => {
     return items.reduce((acc, it) => acc + (Number(it.price) || 0) * (Number(it.quantity) || 0), 0);
   }, [items]);
 
+  // --- Funciones del carrito ---
   function onRemove(id) {
     const updated = removeItem(id);
     setItems(updated);
@@ -57,42 +57,89 @@ export default function Carrito() {
     setItems([]);
   }
 
-  // --- 4. ¡NUEVA FUNCIÓN PARA PAGAR! ---
-  const handlePagar = async () => {
-    setRespuesta(null); // Limpiar mensajes
+  // --- FUNCIÓN GENERAR BOLETA PDF ---
+  const generarBoletaPDF = () => {
+    const doc = new jsPDF();
+    const fecha = new Date().toLocaleDateString('es-CL');
+    const hora = new Date().toLocaleTimeString('es-CL');
 
-    // 4a. Verificar si el usuario está logueado
+    // -- Encabezado --
+    doc.setFontSize(20);
+    doc.text("Verde-Souvenir", 14, 22);
+    
+    doc.setFontSize(10);
+    doc.text("RUT: 77.777.777-7", 14, 28);
+    doc.text("Dirección: Av. Pajaritos 1234, Maipú", 14, 34);
+    
+    // -- Datos del Cliente --
+    doc.text(`Fecha: ${fecha} - ${hora}`, 14, 45);
+    doc.text(`Cliente: ${usuario ? usuario.nombre : 'Cliente Invitado'}`, 14, 50);
+    
+    // -- Tabla de Productos --
+    const tableColumn = ["Producto", "Cantidad", "Precio Unit.", "Total"];
+    const tableRows = [];
+
+    items.forEach(item => {
+      const itemData = [
+        item.name,
+        item.quantity,
+        formatCurrency(item.price),
+        formatCurrency(item.price * item.quantity)
+      ];
+      tableRows.push(itemData);
+    });
+
+    // --- AQUÍ ESTÁ EL ARREGLO MÁGICO ---
+    // En vez de doc.autoTable(...), llamamos a la función directamente y le pasamos el doc
+    autoTable(doc, {
+      startY: 55,
+      head: [tableColumn],
+      body: tableRows,
+      theme: 'striped',
+    });
+    // ------------------------------------
+
+    // -- Total Final --
+    // OJO: Como usamos autoTable directo, a veces 'lastAutoTable' se guarda distinto.
+    // Usamos (doc.lastAutoTable || doc.autoTable.previous) para asegurar.
+    const finalY = (doc.lastAutoTable || doc.autoTable.previous).finalY + 10;
+    
+    doc.setFontSize(14);
+    doc.text(`TOTAL A PAGAR: ${formatCurrency(subtotal)}`, 14, finalY);
+
+    doc.setFontSize(10);
+    doc.text("¡Gracias por tu compra!", 14, finalY + 10);
+
+    doc.save(`Boleta_${Date.now()}.pdf`);
+  };
+
+  // --- FUNCIÓN PAGAR ---
+  const handlePagar = async () => {
+    setRespuesta(null);
+
+    // Validaciones
     if (!usuario) {
       setRespuesta({ message: "Debes iniciar sesión para poder comprar.", type: "error" });
-      // Opcional: redirigir al login después de 2 segundos
       setTimeout(() => navigate('/IniciarSesion'), 2000);
       return;
     }
     
-    // 4b. Verificar si es ADMIN (los admins no deberían comprar)
     if (usuario.role === 'ADMIN') {
         setRespuesta({ message: "Los administradores no pueden realizar compras.", type: "error" });
         return;
     }
 
-    // 4c. Preparar el payload (el JSON para el backend)
+    // Preparar datos para backend
     const payload = {
-      // El backend espera un objeto "usuario" con "id"
       usuario: { id: usuario.id },
-      
-      // El backend espera una lista "detalles"
       detalles: items.map(item => ({
-        // Cada detalle espera un "producto" con "id"
         producto: { id: item.id },
-        // Y la cantidad
         cantidad: item.quantity
-        // (El backend se encargará de buscar el precio y descontar el stock)
       }))
     };
 
     setRespuesta({ message: "Procesando pedido...", type: "info" });
 
-    // 4d. Llamar al backend
     try {
       const response = await fetch(`${API_BASE_URL}/pedidos`, {
         method: 'POST',
@@ -101,13 +148,16 @@ export default function Carrito() {
       });
 
       if (response.ok) {
-        setRespuesta({ message: "¡Pedido realizado con éxito!", type: "success" });
-        onClear(); // Vaciamos el carrito (localStorage y estado)
-        // Opcional: redirigir a una página de "gracias"
-        // setTimeout(() => navigate('/gracias-por-tu-compra'), 2000);
+        setRespuesta({ message: "¡Pedido realizado con éxito! Descargando boleta...", type: "success" });
+        
+        // 1. Generamos la boleta AHORA que sabemos que se pagó bien
+        generarBoletaPDF();
+        
+        // 2. Limpiamos el carrito
+        onClear(); 
+
       } else {
-        // Si el backend falla (ej. "Sin stock")
-        const errorMsg = await response.text(); // Leemos el mensaje de error
+        const errorMsg = await response.text();
         setRespuesta({ message: `Error: ${errorMsg || 'No se pudo procesar el pedido.'}`, type: "error" });
       }
     } catch (err) {
@@ -116,13 +166,10 @@ export default function Carrito() {
     }
   };
 
-
-  // --- 5. JSX (HTML) ACTUALIZADO ---
   return (
     <section className="container carrito-page">
       <h1>Carrito</h1>
 
-      {/* --- 6. Mostrar mensajes de respuesta (éxito/error) --- */}
       {respuesta && (
         <div 
           className="estado" 
@@ -136,13 +183,12 @@ export default function Carrito() {
         </div>
       )}
 
-      {items.length === 0 && !respuesta ? ( // Oculta si hay un mensaje de "pedido exitoso"
+      {items.length === 0 && !respuesta ? (
         <div className="estado">Tu carrito está vacío. Explora nuestros <a href="/productos">productos</a>.</div>
-      ) : items.length > 0 && ( // Solo muestra la tabla si hay items
+      ) : items.length > 0 && (
         <div className="carrito-layout">
           <div className="carrito-table-wrapper">
             <table className="carrito-table">
-              {/* ... (tu <thead> sigue igual) ... */}
               <thead>
                 <tr>
                   <th style={{ width: '60px' }}>Img</th>
@@ -153,7 +199,6 @@ export default function Carrito() {
                   <th style={{ width: '80px' }}></th>
                 </tr>
               </thead>
-              {/* ... (tu <tbody> sigue igual) ... */}
               <tbody>
                 {items.map((it) => {
                   const total = (Number(it.price) || 0) * (Number(it.quantity) || 0);
@@ -214,11 +259,9 @@ export default function Carrito() {
               <strong>{formatCurrency(subtotal)}</strong>
             </div>
 
-            {/* --- 7. BOTÓN "IR A PAGAR" ACTUALIZADO --- */}
             <button 
               className="btn-primary" 
               onClick={handlePagar}
-              // Se deshabilita si no hay items, si no estás logueado, o si eres admin
               disabled={items.length === 0 || !usuario || usuario.role === 'ADMIN'}
               title={!usuario ? "Debes iniciar sesión para pagar" : (usuario.role === 'ADMIN' ? "Los admins no pueden comprar" : "Finalizar Pedido")}
             >
