@@ -4,8 +4,8 @@ import { describe, it, expect } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import BarraLat from './BarraLat';
 
-describe('BarraLat Component', () => {
-  it('should render all navigation links', () => {
+describe('Componente BarraLat', () => {
+  it('debería renderizar todos los enlaces de navegación', () => {
     render(
       <MemoryRouter>
         <BarraLat />
@@ -19,7 +19,7 @@ describe('BarraLat Component', () => {
     expect(screen.getByText('Cerrar Sesión')).toBeInTheDocument();
   });
 
-  it('should have correct href for navigation links', () => {
+  it('debería tener el href correcto para los enlaces de navegación', () => {
     render(
       <MemoryRouter>
         <BarraLat />

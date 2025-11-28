@@ -5,13 +5,13 @@ import { MemoryRouter } from 'react-router-dom';
 import IniciarSesion from './IniciarSesion';
 import userEvent from '@testing-library/user-event';
 
-describe('IniciarSesion Component', () => {
+describe('Componente IniciarSesion', () => {
   beforeEach(() => {
     // Limpiamos los mocks antes de cada prueba
     vi.restoreAllMocks();
   });
 
-  it('should render the login form', () => {
+  it('debería renderizar el formulario de inicio de sesión', () => {
     render(
       <MemoryRouter>
         <IniciarSesion />
@@ -23,7 +23,7 @@ describe('IniciarSesion Component', () => {
     expect(screen.getByRole('button', { name: 'Iniciar Sesión' })).toBeInTheDocument();
   });
 
-  it('should allow user to type in the input fields', async () => {
+  it('debería permitir al usuario escribir en los campos de entrada', async () => {
     const user = userEvent.setup();
     render(
       <MemoryRouter>
@@ -40,7 +40,7 @@ describe('IniciarSesion Component', () => {
     expect(passwordInput).toHaveValue('password');
   });
 
-  it('should show an error message on failed login', async () => {
+  it('debería mostrar un mensaje de error en un inicio de sesión fallido', async () => {
     const user = userEvent.setup();
 
     // Mock de la función fetch para simular una respuesta de error
