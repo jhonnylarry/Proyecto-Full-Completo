@@ -240,6 +240,37 @@ export default function ModificarPro() {
 		);
 	}, [lista, search]);
 
+	const handleDelete = async (idToDelete) => {
+		if (!window.confirm('¿Estás seguro de que quieres eliminar este producto? Esta acción no se puede deshacer.')) {
+			return;
+		}
+
+		setError(null);
+		setListLoading(true); // Usar el loading de la lista para feedback visual
+
+		try {
+			const response = await fetch(`${API_BASE_URL}/productos/${idToDelete}`, {
+				method: 'DELETE',
+			});
+
+			if (response.ok) {
+				// Si se borra con éxito, actualizamos la lista de productos
+				setLista(prevLista => prevLista.filter(p => p.id !== idToDelete));
+				alert('Producto eliminado con éxito.');
+			} else {
+				const errorMsg = await response.text();
+				throw new Error(errorMsg || 'No se pudo eliminar el producto.');
+			}
+		} catch (err) {
+			console.error("Error al eliminar:", err);
+			setError(err.message);
+		} finally {
+			setListLoading(false);
+		}
+	};
+
+	// --- RENDER ---
+	// 1) Modo Selección: Listar productos para elegir cuál editar
 	return (
 		<div className="admin-main">
 			<h1 className="admin-main-title">Modificar Producto</h1>
@@ -284,7 +315,12 @@ export default function ModificarPro() {
 										<td>{p?.categoria?.nombre ?? p?.categoria?.id ?? '-'}</td>
 										<td>{p.activo ? 'Sí' : 'No'}</td>
 										<td>
-											<button type="button" className="editar-btn" onClick={() => navigate(`/admin/productos/editar/${p.id}`)}>Editar</button>
+											<button className="btn-admin btn-edit" onClick={() => navigate(`/admin/productos/editar/${p.id}`)}>
+												Editar
+											</button>
+											<button className="btn-admin btn-delete" onClick={() => handleDelete(p.id)} style={{ marginLeft: '8px' }}>
+												Eliminar
+											</button>
 										</td>
 									</tr>
 								))}
@@ -300,145 +336,162 @@ export default function ModificarPro() {
 			) : loadingInit ? (
 				<div className="loading">Cargando información...</div>
 			) : (
-				<form className="editar-form" onSubmit={handleSubmit}>
-					<div className="form-row">
-						<div className="form-group">
-							<label htmlFor="codigo_producto">Código de Producto <span className="required">*</span></label>
-							<input
-								id="codigo_producto"
-								name="codigo_producto"
-								type="text"
-								value={producto.codigo_producto}
-								onChange={handleChange}
-								disabled={loading}
-								maxLength={50}
-								required
-							/>
-						</div>
+				<form className="admin-form" onSubmit={handleSubmit}>
+					<h2 className="admin-form-title">Editar Producto: {producto.nombre || '...'}</h2>
 
-						<div className="form-group">
-							<label htmlFor="nombre">Nombre <span className="required">*</span></label>
-							<input
-								id="nombre"
-								name="nombre"
-								type="text"
-								value={producto.nombre}
-								onChange={handleChange}
-								disabled={loading}
-								maxLength={100}
-								required
-							/>
-						</div>
-					</div>
+					{loading && <div className="form-feedback form-feedback-info">Guardando...</div>}
+					{error && <div className="form-feedback form-feedback-error">{error}</div>}
 
-					<div className="form-row">
-						<div className="form-group">
-							<label htmlFor="price">Precio <span className="required">*</span></label>
-							<div className="price-input">
-								<span className="currency">$</span>
+					<div className="form-grid">
+						{/* Columna Izquierda: Campos de texto */}
+						<div className="form-col">
+							<div className="form-group">
+								<label htmlFor="codigo_producto">Código de Producto <span className="required">*</span></label>
 								<input
-									id="price"
-									name="precio"
+									id="codigo_producto"
+									name="codigo_producto"
+									type="text"
+									value={producto.codigo_producto}
+									onChange={handleChange}
+									disabled={loading}
+									maxLength={50}
+									required
+								/>
+							</div>
+
+							<div className="form-group">
+								<label htmlFor="nombre">Nombre <span className="required">*</span></label>
+								<input
+									id="nombre"
+									name="nombre"
+									type="text"
+									value={producto.nombre}
+									onChange={handleChange}
+									disabled={loading}
+									maxLength={100}
+									required
+								/>
+							</div>
+
+							<div className="form-group">
+								<label htmlFor="price">Precio <span className="required">*</span></label>
+								<div className="price-input">
+									<span className="currency">$</span>
+									<input
+										id="price"
+										name="precio"
+										type="number"
+										min="1"
+										step="1"
+										value={producto.precio}
+										onChange={handleChange}
+										disabled={loading}
+										required
+									/>
+								</div>
+							</div>
+
+							<div className="form-group">
+								<label htmlFor="stock">Stock <span className="required">*</span></label>
+								<input
+									id="stock"
+									name="stock"
 									type="number"
-									min="1"
+									min="0"
 									step="1"
-									value={producto.precio}
+									value={producto.stock}
 									onChange={handleChange}
 									disabled={loading}
 									required
 								/>
 							</div>
-						</div>
 
-						<div className="form-group">
-							<label htmlFor="stock">Stock <span className="required">*</span></label>
-							<input
-								id="stock"
-								name="stock"
-								type="number"
-								min="0"
-								step="1"
-								value={producto.stock}
-								onChange={handleChange}
-								disabled={loading}
-								required
-							/>
-						</div>
-
-						<div className="form-group">
-							<label htmlFor="stock_critico">Stock Crítico <span className="required">*</span></label>
-							<input
-								id="stock_critico"
-								name="stock_critico"
-								type="number"
-								min="0"
-								step="1"
-								value={producto.stock_critico}
-								onChange={handleChange}
-								disabled={loading}
-								required
-							/>
-						</div>
-					</div>
-
-					<div className="form-group">
-						<label htmlFor="descripcion">Descripción <span className="required">*</span></label>
-						<textarea
-							id="descripcion"
-							name="descripcion"
-							rows="4"
-							value={producto.descripcion}
-							onChange={handleChange}
-							disabled={loading}
-							maxLength={500}
-							required
-						/>
-						<small className="char-count">{producto.descripcion.length}/500 caracteres</small>
-					</div>
-
-					<div className="form-group">
-						<label htmlFor="categoria">Categoría <span className="required">*</span></label>
-						<select
-							id="categoria"
-							name="categoria"
-							value={producto.categoria}
-							onChange={handleChange}
-							disabled={loading || categorias.length === 0}
-							required
-						>
-							<option value="">Seleccione una categoría</option>
-							{categorias.map((cat) => (
-								<option key={cat.id} value={cat.id}>{cat.nombre}</option>
-							))}
-						</select>
-					</div>
-
-					<div className="form-group">
-						<label htmlFor="imagen">Imagen (opcional, ≤ 2MB)</label>
-						<input id="imagen" name="imagen" type="file" accept="image/*" onChange={handleFileChange} disabled={loading} />
-
-						{/* Imagen actual (si no se seleccionó nueva) */}
-						{!imagenPreview && imagenActualUrl && (
-							<div className="image-preview" style={{ marginTop: 8 }}>
-								<img src={imagenActualUrl} alt="Imagen actual" />
+							<div className="form-group">
+								<label htmlFor="stock_critico">Stock Crítico <span className="required">*</span></label>
+								<input
+									id="stock_critico"
+									name="stock_critico"
+									type="number"
+									min="0"
+									step="1"
+									value={producto.stock_critico}
+									onChange={handleChange}
+									disabled={loading}
+									required
+								/>
 							</div>
-						)}
 
-						{/* Preview de nueva imagen */}
-						{imagenPreview && (
-							<div className="image-preview" style={{ marginTop: 8 }}>
-								<img src={imagenPreview} alt="Previsualización" />
-								<button type="button" className="remove-image" onClick={removeImage}>Quitar</button>
+							<div className="form-group">
+								<label htmlFor="descripcion">Descripción <span className="required">*</span></label>
+								<textarea
+									id="descripcion"
+									name="descripcion"
+									rows="4"
+									value={producto.descripcion}
+									onChange={handleChange}
+									disabled={loading}
+									maxLength={500}
+									required
+								/>
+								<small className="char-count">{producto.descripcion.length}/500 caracteres</small>
 							</div>
-						)}
+
+							<div className="form-group">
+								<label htmlFor="categoria">Categoría <span className="required">*</span></label>
+								<select
+									id="categoria"
+									name="categoria"
+									value={producto.categoria}
+									onChange={handleChange}
+									disabled={loading || categorias.length === 0}
+									required
+								>
+									<option value="">Seleccione una categoría</option>
+									{categorias.map((cat) => (
+										<option key={cat.id} value={cat.id}>{cat.nombre}</option>
+									))}
+								</select>
+							</div>
+
+							<div className="form-group">
+								<label htmlFor="activo">Estado</label>
+								<select name="activo" id="activo" value={producto.activo} onChange={handleChange}>
+									<option value="true">Activo</option>
+									<option value="false">Inactivo</option>
+								</select>
+							</div>
+						</div>
+
+						{/* Columna Derecha: Imagen */}
+						<div className="form-col">
+							<div className="form-group">
+								<label htmlFor="imagen">Imagen (opcional, ≤ 2MB)</label>
+								<input id="imagen" name="imagen" type="file" accept="image/*" onChange={handleFileChange} disabled={loading} />
+
+								{/* Imagen actual (si no se seleccionó nueva) */}
+								{!imagenPreview && imagenActualUrl && (
+									<div className="image-preview" style={{ marginTop: 8 }}>
+										<img src={imagenActualUrl} alt="Imagen actual" />
+									</div>
+								)}
+
+								{/* Preview de nueva imagen */}
+								{imagenPreview && (
+									<div className="image-preview" style={{ marginTop: 8 }}>
+										<img src={imagenPreview} alt="Previsualización" />
+										<button type="button" className="remove-image" onClick={removeImage}>Quitar</button>
+									</div>
+								)}
+							</div>
+						</div>
 					</div>
 
 					<div className="form-actions">
-						<button type="submit" disabled={loading} className="editar-btn">
-							{loading ? 'Guardando...' : 'Guardar Cambios'}
+						<button type="button" className="btn-admin btn-secondary" onClick={() => navigate('/admin/productos/editar')}>
+							Cancelar / Volver a la lista
 						</button>
-						<button type="button" onClick={handleCancel} disabled={loading} className="btn-secondary">
-							Cancelar
+						<button type="submit" className="btn-admin btn-primary" disabled={loading}>
+							Guardar Cambios
 						</button>
 					</div>
 				</form>
