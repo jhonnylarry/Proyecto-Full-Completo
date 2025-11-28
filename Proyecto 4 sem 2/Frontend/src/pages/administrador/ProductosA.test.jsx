@@ -4,8 +4,8 @@ import { describe, it, expect } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import ProductosA from './ProductosA';
 
-describe('ProductosA Component', () => {
-  it('should render the main title', () => {
+describe('Componente ProductosA', () => {
+  it('debería renderizar el título principal', () => {
     render(
       <MemoryRouter>
         <ProductosA />
@@ -14,7 +14,7 @@ describe('ProductosA Component', () => {
     expect(screen.getByText('Administración de Productos')).toBeInTheDocument();
   });
 
-  it('should render navigation cards with correct links', () => {
+  it('debería renderizar las tarjetas de navegación con los enlaces correctos', () => {
     render(
       <MemoryRouter>
         <ProductosA />

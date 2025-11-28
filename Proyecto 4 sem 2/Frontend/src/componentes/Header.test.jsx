@@ -4,8 +4,8 @@ import { describe, it, expect } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import Header from './Header';
 
-describe('Header Component', () => {
-  it('should render all navigation links', () => {
+describe('Componente Header', () => {
+  it('debería renderizar todos los enlaces de navegación', () => {
     render(
       <MemoryRouter>
         <Header />
@@ -19,7 +19,7 @@ describe('Header Component', () => {
     expect(screen.getByText('Contacto')).toBeInTheDocument();
   });
 
-  it('should have correct href for navigation links', () => {
+  it('debería tener el href correcto para los enlaces de navegación', () => {
     render(
       <MemoryRouter>
         <Header />

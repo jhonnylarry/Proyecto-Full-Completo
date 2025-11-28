@@ -4,8 +4,8 @@ import { describe, it, expect } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import Footer from './Footer';
 
-describe('Footer Component', () => {
-  it('should render the copyright notice', () => {
+describe('Componente Footer', () => {
+  it('debería renderizar el aviso de copyright', () => {
     render(
       <MemoryRouter>
         <Footer />
