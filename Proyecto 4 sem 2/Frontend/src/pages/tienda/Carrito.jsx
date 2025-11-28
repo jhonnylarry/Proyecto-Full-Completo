@@ -89,8 +89,7 @@ export default function Carrito() {
       tableRows.push(itemData);
     });
 
-    // --- AQUÍ ESTÁ EL ARREGLO MÁGICO ---
-    // En vez de doc.autoTable(...), llamamos a la función directamente y le pasamos el doc
+  
     autoTable(doc, {
       startY: 55,
       head: [tableColumn],
@@ -100,8 +99,7 @@ export default function Carrito() {
     // ------------------------------------
 
     // -- Total Final --
-    // OJO: Como usamos autoTable directo, a veces 'lastAutoTable' se guarda distinto.
-    // Usamos (doc.lastAutoTable || doc.autoTable.previous) para asegurar.
+    //
     const finalY = (doc.lastAutoTable || doc.autoTable.previous).finalY + 10;
     
     doc.setFontSize(14);
